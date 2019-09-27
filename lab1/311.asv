@@ -1,0 +1,2 @@
+rooster = imread('.\data\rooster.jpg');
+rooster = int2
