@@ -1,3 +1,4 @@
+clear;read_pic;
 bxmask5 = fspecial('average',5);
 bxmask25 = fspecial('average',25);
 

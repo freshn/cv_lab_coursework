@@ -1,3 +1,4 @@
+clear;read_pic;
 gaussian1_5 = fspecial('gaussian',[25 25],1.5);
 gaussian10 = fspecial('gaussian',[25 25],10);
 
