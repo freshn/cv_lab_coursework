@@ -1,5 +1,5 @@
 clear;read_pic;
-Gmask = fspecial('gaussian',[5 5],5);
+Gmask = fspecial('gaussian',7,5);
 drvtmask = [-1 1];
 Gdrvtmask1 = conv2(Gmask,drvtmask);
 Gdrvtmask2 = conv2(Gmask,drvtmask');
@@ -17,5 +17,5 @@ subplot(224),imagesc(y);
 title('conv with Gaussian derivative mask(y)');colormap('jet'),colorbar
 print -dpng q511.png 
 
-max(x(:)) % 0.2080
-max(y(:)) % 0.2080
+max(x(:)) % 0.1544
+max(y(:)) % 0.1544
