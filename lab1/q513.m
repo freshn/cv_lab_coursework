@@ -1,5 +1,5 @@
 clear;read_pic;
-Gmask = fspecial('gaussian',7,1.5);
+Gmask = fspecial('gaussian',9,1.5);
 drvtmask = [-1 1];
 Gdrvtmask1 = conv2(Gmask,drvtmask,'same');
 Gdrvtmask2 = conv2(Gmask,drvtmask','same');

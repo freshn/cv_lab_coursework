@@ -1,7 +1,7 @@
 clear;read_pic;
 l1 = -1/8.*[1 1 1;1 -8 1;1 1 1];
-Gmask1 = fspecial('gaussian',7,1.5);
-Gmask2 = fspecial('gaussian',7,5);
+Gmask1 = fspecial('gaussian',9,1.5);
+Gmask2 = fspecial('gaussian',30,5);
 LoGmask1 = conv2(Gmask1,l1,'valid');
 LoGmask2 = conv2(Gmask2,l1,'valid');
 x = conv2(boxes,LoGmask1);
@@ -16,5 +16,7 @@ subplot(224),imagesc(y);title('conv from LoG5');
 colormap('jet'),colorbar;
 print -dpng q521.png
 
-max(x(:)) % 0.1061
-max(y(:)) % 0.0150
+max(x(:)) % 0.1029
+max(y(:)) % 0.0067
+min(x(:)) % -0.0624
+min(y(:)) % -0.0047

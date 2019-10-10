@@ -1,6 +1,6 @@
 clear;read_pic;
-gaussian1_5 = fspecial('gaussian',[25 25],1.5);
-gaussian10 = fspecial('gaussian',[25 25],10);
+gaussian1_5 = fspecial('gaussian',9,1.5);
+gaussian10 = fspecial('gaussian',60,10);
 
 figure(2);set(gcf,'position',[50,50,800,620]);
 subplot(221),imagesc(conv2(rooster,gaussian1_5,'same'));

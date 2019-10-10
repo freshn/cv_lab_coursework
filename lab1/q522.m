@@ -1,7 +1,7 @@
 clear;read_pic;
 l1 = -1/8.*[1 1 1;1 -8 1;1 1 1];
 Gmask1 = fspecial('gaussian',9,1.5);
-Gmask2 = fspecial('gaussian',9,5);
+Gmask2 = fspecial('gaussian',30,5);
 LoGmask1 = conv2(Gmask1,l1,'valid');
 LoGmask2 = conv2(Gmask2,l1,'valid');
 x = conv2(rooster,LoGmask1);
