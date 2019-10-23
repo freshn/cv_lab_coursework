@@ -5,3 +5,5 @@ boxes = imread('..\data\boxes.pgm');
 boxes = im2double(boxes);
 ele = imread('..\data\elephant.png');
 ele = im2double(ele);
+woods = imread('..\data\woods.png');
+woods = im2double(woods);

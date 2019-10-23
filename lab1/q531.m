@@ -11,8 +11,10 @@ end
 a = max(cells,[],3);
 
 figure(1),set(gcf,'position',[50,50,800,620]);
-subplot(221),imagesc(ele1),colorbar;
+subplot(221),imagesc(ele1),colorbar;title('ele conv by gabor mask');
 subplot(222),imagesc(sqrt(ele1.^2+ele2.^2)),colorbar;
+title('ele conv by sqrt of 2 gabor mask');
 subplot(223),imagesc(a),colorbar;
+title('max value of gabor masks with differnet orients');
 
 print -dpng q531.png
