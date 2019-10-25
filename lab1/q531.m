@@ -7,8 +7,9 @@ ele2 = conv2(ele,gb2,'valid');
 cells = zeros(57,57,12);
 for j = 0:15:165
         cells(:,:,1+j/15) = gabor2(4,8,j,0.5,0);
+        results(:,:,1+j/15) = conv2(ele,cells(:,:,1+j/15),'same');
 end
-a = max(cells,[],3);
+a = max(results,[],3);
 
 figure(1),set(gcf,'position',[50,50,800,620]);
 subplot(221),imagesc(ele1),colorbar;title('ele conv by gabor mask');
