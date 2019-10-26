@@ -4,8 +4,8 @@ Gmask1 = fspecial('gaussian',9,1.5);
 Gmask2 = fspecial('gaussian',30,5);
 LoGmask1 = conv2(Gmask1,l1,'valid');
 LoGmask2 = conv2(Gmask2,l1,'valid');
-x = conv2(boxes,LoGmask1);
-y = conv2(boxes,LoGmask2);
+x = conv2(boxes,LoGmask1,'same');
+y = conv2(boxes,LoGmask2,'same');
 
 figure(1);set(gcf,'position',[50,50,800,620]);
 subplot(221),mesh(LoGmask1);title('LoG mask from Gmask1.5');
