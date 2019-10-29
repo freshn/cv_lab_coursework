@@ -3,8 +3,8 @@ Gmask = fspecial('gaussian',30,5);
 drvtmask = [-1 1];
 Gdrvtmask1 = conv2(Gmask,drvtmask);
 Gdrvtmask2 = conv2(Gmask,drvtmask');
-x = conv2(boxes,Gdrvtmask1);
-y = conv2(boxes,Gdrvtmask2);
+x = conv2(boxes,Gdrvtmask1,'same');
+y = conv2(boxes,Gdrvtmask2,'same');
 
 figure(1);set(gcf,'position',[50,50,800,620]);
 subplot(221),mesh(Gdrvtmask1);
