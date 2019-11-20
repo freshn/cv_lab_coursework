@@ -13,42 +13,39 @@ function [pos2,acc] = find_matches(I1, pos1, I2)
  
 %% build cornerpoints for pos1
    pt1 = cornerPoints(pos1);
-% fake match
-%  pt2 = HarrisDetector(I2);
-%  pt2 = cornerPoints(pt2);
-%   pt1 = detectHarrisFeatures(rgb2gray(I1),'MinQuality',0.002);
-%   pt1 = pt1.selectStrongest(size(pos1,1));
 
-   pt2 = detectHarrisFeatures(rgb2gray(I2),'MinQuality',0.002);
-%    pt2 = detectFASTFeatures(rgb2gray(I2),'MinQuality',0.002);
-    pt2_ORB = detectORBFeatures(rgb2gray(I2));
-% rebuild cornerpoints for pos2
-   pt2_ORB = pt2_ORB.Location;
-   pt2_ORB = cornerPoints(pt2_ORB);
+   pt2_H = detectHarrisFeatures(rgb2gray(I2),'MinQuality',0.002);
+   pt2_FAST = detectFASTFeatures(rgb2gray(I2),'MinQuality',0.002);
+   pt2_ORB = detectORBFeatures(rgb2gray(I2));
+   pt2_ORB = rb(pt2_ORB);
+   pt2_BRISK = detectBRISKFeatures(rgb2gray(I2),'MinQuality',0.002);
+%   pt2_BRISK = rb(pt2_BRISK);
+   pt2_ME = detectMinEigenFeatures(rgb2gray(I2),'MinQuality',0.002);
 disp(['pos1 numbers:' num2str(size(pos1,1))]);
   
 %% extract features
   [f1, vpt1] = extf(I1, pt1);
-  [f2, vpt2] = extf(I2, pt2); 
+  [f2_H, vpt2_H] = extf(I2, pt2_H); 
+  [f2_FAST, vpt2_FAST] = extf(I2, pt2_FAST);
   [f2_ORB, vpt2_ORB] = extf(I2, pt2_ORB);  
+%  [f2_BRISK, vpt2_BRISK] = extf(I2, pt2_BRISK); 
+  [f2_ME, vpt2_ME] = extf(I2, pt2_ME);
   
 %% matching
-  [m1, m2] = match(f1, f2, vpt1, vpt2);
+  [m1_H, m2_H] = match(f1, f2_H, vpt1, vpt2_H);
+  [m1_FAST, m2_FAST] = match(f1, f2_FAST, vpt1, vpt2_FAST);
   [m1_ORB, m2_ORB] = match(f1, f2_ORB,vpt1, vpt2_ORB);
- 
+%  [m1_BRISK, m2_BRISK] = match(f1, f2_BRISK,vpt1, vpt2_BRISK);
+  [m1_ME, m2_ME] = match(f1, f2_ME, vpt1, vpt2_ME);
 %% correct error matches  
-  [vm1_H, vm2_H] = vmatch(m1, m2);
+  [vm1_H, vm2_H] = vmatch(m1_H, m2_H);
+  [vm1_FAST, vm2_FAST] = vmatch(m1_FAST, m2_FAST);
   [vm1_ORB, vm2_ORB] = vmatch(m1_ORB, m2_ORB);
+%  [vm1_BRISK, vm2_BRISK] = vmatch(m1_BRISK, m2_BRISK);
+  [vm1_ME, vm2_ME] = vmatch(m1_ME, m2_ME);
 
-%   if size(vm1_H,1) < size(vm1_ORB,1)
-%       vm1 = vm1_ORB;
-%       vm2 = vm2_ORB;
-%   else
-%       vm1 = vm1_H;
-%       vm2 = vm2_H;
-%   end    
-  vm1_list = {vm1_H, vm1_ORB};
-  vm2_list = {vm2_H, vm2_ORB};
+  vm1_list = {vm1_H, vm1_FAST, vm1_ORB, vm1_ME};
+  vm2_list = {vm2_H, vm2_FAST, vm2_ORB, vm2_ME};
   a = 0;
   for i = 1:length(vm1_list)
       if size(vm1_list{i},1)>a
@@ -79,16 +76,24 @@ end
 
 %% utlization
 function [feature, vpt] = extf(I, pt)
+% extract features
     [feature, vpt] = extractFeatures(rgb2gray(I), pt,'FeatureSize',128);
 end
 function [matched1, matched2] = match(feature1, feature2, vpt1, vpt2)
-     indexPairs = matchFeatures(feature1,feature2,'Method',...
+% matching
+    indexPairs = matchFeatures(feature1,feature2,'Method',...
       'NearestNeighborSymmetric','MatchThreshold',85);  
      matched1 = vpt1(indexPairs(:,1));
      matched2 = vpt2(indexPairs(:,2));  
 end
 function [vmatched1, vmatched2] = vmatch(m1, m2)
-      [T,vmatched1,vmatched2] = estimateGeometricTransform...
+% find vaild matched
+      [T,vmatched1,vmatched2,status] = estimateGeometricTransform...
       (m1,m2,'similarity','MaxNumTrials',4500,...
       'MaxDistance',9.5,'Confidence',70);
+end
+function pt = rb(pt_)
+% rebuild cornerpoints for pt_
+    pt = pt_.Location;
+    pt = cornerPoints(pt);
 end
