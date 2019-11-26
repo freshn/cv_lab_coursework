@@ -12,11 +12,11 @@ function [pos2,acc] = find_matches(I1, pos1, I2)
 
   
 %% Ask if SIFT is needed  
-   prompt = ['SIFT would increase accuracy but decrease speed.', 10, ...
-       'Is SIFT needed? y/n [y]:'];
+   prompt = ['SIFT would increase the accuracy but decrease t',...
+       'cost. Is SIFT needed? y/n [n]:'];
    str = input(prompt,'s');
    if isempty(str)
-      str = 'y';
+      str = 'n';
    end
 %% Build Points Object  
    tic
@@ -37,7 +37,7 @@ function [pos2,acc] = find_matches(I1, pos1, I2)
    pt2_ME = detectMinEigenFeatures(rgb2gray(I2),'MinQuality',0.002);
    % show numbers of points
    disp(['pos1 numbers:' num2str(size(pos1,1))]);
-%% Extract Features
+%% extract features
   disp('extracting features...');
   [f1, vpt1] = extf(I1, pt1);
   [f1_BRISK, vpt1_BRISK] = extf(I1, pt1_BRISK);
@@ -50,7 +50,7 @@ function [pos2,acc] = find_matches(I1, pos1, I2)
   [f2_BRISK, vpt2_BRISK] = extf(I2, pt2_BRISK); 
   [f2_ME, vpt2_ME] = extf(I2, pt2_ME);
  
-%% Matching
+%% matching
   disp('matching...');
   [m1_H, m2_H] = match(f1, f2_H, vpt1, vpt2_H);
   [m1_FAST, m2_FAST] = match(f1, f2_FAST, vpt1, vpt2_FAST); 
@@ -59,7 +59,7 @@ function [pos2,acc] = find_matches(I1, pos1, I2)
   [m1_BRISK, m2_BRISK] = match(f1_BRISK, f2_BRISK,vpt1_BRISK, vpt2_BRISK);
   [m1_ME, m2_ME] = match(f1, f2_ME, vpt1, vpt2_ME);
   
-%% Correct Error Matches  
+%% correct error matches  
   disp('vailding...');
   [vm1_H, vm2_H] = vmatch(m1_H, m2_H);
   [vm1_FAST, vm2_FAST] = vmatch(m1_FAST, m2_FAST);
@@ -68,7 +68,7 @@ function [pos2,acc] = find_matches(I1, pos1, I2)
   [vm1_BRISK, vm2_BRISK] = vmatch(m1_BRISK, m2_BRISK);
   [vm1_ME, vm2_ME] = vmatch(m1_ME, m2_ME);
 
-%% Boosting   
+%% boosting   
   disp('boosting...');
   % build methods list
   vm1_list = {vm1_H, vm1_ORB, vm1_SURF, vm1_BRISK, vm1_FAST, vm1_ME};
@@ -111,7 +111,7 @@ function [pos2,acc] = find_matches(I1, pos1, I2)
   disp(['selected method:' num2str(method_index)]);
   disp(['first matched numbers:' num2str(size(vm1,1))]);
   
-%% Return pos2  
+%% return pos2  
    pos2 = zeros(size(pos1));
   % check whether vm1 is in pos1 and return index
   [~, index] = ismember(vm1.Location,pos1,'rows'); 
@@ -136,7 +136,7 @@ function [pos2,acc] = find_matches(I1, pos1, I2)
   pos2(pos2(:,1)==0,1) = pos1(pos2(:,1)==0,1)*size(I2,2)/size(I1,2);
   pos2(pos2(:,2)==0,2) = pos1(pos2(:,2)==0,2)*size(I2,1)/size(I1,1);
   disp(['final matched numbers:' num2str(size(pos2,1)) 10]);
-%% Show Matches 
+%% show matches 
   width = size(I1,2)*0.7;height = size(I1,1)*0.7;
   figure;set(gcf,'position',[50,0,width,height]);
   subplot(221);axis tight;
@@ -150,7 +150,7 @@ function [pos2,acc] = find_matches(I1, pos1, I2)
   toc
 end
 
-%% Utlization
+%% utlization
 function [feature, vpt] = extf(I, pt)
 % extract features
     [feature, vpt] = extractFeatures(rgb2gray(I), pt,'FeatureSize',128);
