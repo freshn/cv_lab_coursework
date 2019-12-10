@@ -53,6 +53,7 @@ function I_b = detectB(I)
 end
 function I = detectEdge(I, hsize, sigma)
     mask = fspecial('log', hsize, sigma);
+    I = imfilter(I, fspecial('gaussian'));
     I = imfilter(I, mask);
     I = I < 0;
     I = imopen(I, strel('disk', 2));
@@ -62,13 +63,15 @@ function I = detectEdge(I, hsize, sigma)
     I = imdilate(I, strel('disk',2));
     I = imerode(I, strel('diamond', 2));
     I = bwareaopen(I, 150);
+    %I = edge(I, 'log', 0.005);
+    %I = edge(I, 'canny', [0.1, 0.9], 1);
 end
 function num = countCircles(I, threshold)
     %I = rgb2gray(I);
-    [n, l] = bwboundaries(I);
-    s = regionprops(l, 'Circularity');
+    [b, L] = bwboundaries(I);
+    s = regionprops(L, 'Circularity');
     num = 0;
-    for i = 1:length(n)
+    for i = 1:length(b)
         if abs(s(i).Circularity-1) <= threshold
             num = num + 1;
         end
@@ -83,10 +86,32 @@ function [num, selectedLego] = count(I, mask, min, max)
     selectedLego = zeros(size(I));
     for i = 1:index
         R = I .* (lm == i);
+        [c_hough, r, m] = imfindcircles(R, [12, 35], 'Sensitivity', 0.85);
+        c_h = size(c_hough, 1);
+        [c_hough_, r_, m] = imfindcircles(~R, [12, 35], 'Sensitivity', 0.85);
+        c_h_ = size(c_hough_, 1);
         c = countCircles(R, 0.15);
-        if c >= min && c <= max && c ~= min+2
-            num = num + 1;
-            selectedLego = xor(selectedLego,R);
-        end
-    end    
+        c_ = countCircles(~R, 0.15);
+        if max == 4
+            if ((c>=min && c<=max && c~=min+2)&&(c_>=min && c_<=max && c_~=min+2)) ...
+                    || ((c_h>=min && c_h<=max && c_h~=min+2)&&(c_h_>=min && c_h_<=max && c_h_~=min+2))
+                num = num + 1;
+                selectedLego = xor(selectedLego,R);
+            end    
+        else    
+            if ((c>=min && c<=max && c~=min+2)&&(c_>=min && c_<=max && c_~=min+2)) ...
+                    || ((c_h>=min && c_h<=max && c_h~=min+2)&&(c_h_>=min && c_h_<=max && c_h_~=min+2))
+                num = num + 1;
+                selectedLego = xor(selectedLego,R);
+            end    
+            if (c>max+min||c_>max+min)&&(c_h>max+min||c_h_>max+min)&&(c<min||c<=min||c_h<min||c_h_<min) 
+                num = num + 1;
+                selectedLego = xor(selectedLego,R);    
+            end
+            if (c>max+min||c_>max+min)&&(c_h>max+min||c_h_>max+min)&&(c>=min&&c_>=min&&c_h>=min&&c_h_>=min) 
+                num = num + 2;
+                selectedLego = xor(selectedLego,R);    
+            end
+        end    
+    end
 end

@@ -1,5 +1,5 @@
 clc,clear;
-for i = 3
+for i = 1
     if i <= 9
         I = imread(['img/train0', num2str(i), '.jpg']);
     else
