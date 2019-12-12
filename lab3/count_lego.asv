@@ -56,8 +56,8 @@ function I = detectEdge(I, hsize, sigma)
     I = imfilter(I, fspecial('gaussian'));
     I = imfilter(I, mask);
     I = I < 0;
-    I = imopen(I, strel('disk',2));
-    I = imclose(I, strel('disk',2));
+    I = bwmorph(I, 'open', 10);
+    I = bwmorph(I, 'close', 10);
     I = ~bwareaopen(~I, 300);
     
     I = imdilate(I, strel('disk',2));
