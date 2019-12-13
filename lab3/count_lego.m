@@ -62,7 +62,8 @@ function I = detectEdge(I, hsize, sigma)
     
     I = imdilate(I, strel('disk',2));
     I = imerode(I, strel('diamond', 2));
-    I = bwareaopen(I, 150);
+    I = bwareaopen(I, 200);
+    I = ~bwmorph(~I, 'majority', 5);
 end
 function num = CircularityCountCircles(I, threshold)
     [b, L] = bwboundaries(I);
@@ -102,14 +103,21 @@ function [num, selectedLego] = count(I, mask, min, max)
         cn = CircularityCountCircles(~R, 0.15);
         c = round(a*cn+(1-a)*cp);
         if max == 4
-            if (c>=min && c<=max && c~=min+2) ...
+            if (c>=min && c<=max && c~=min+2 && c~=min+1) ...
                     || ((c_h>=min && c_h<=max && c_h~=min+2)&&(c_h_>=min && c_h_<=max && c_h_~=min+2))
                 num = num + 1;
                 selectedLego = xor(selectedLego,R);
             end    
         else    
-            if (c>=min && c<=max && c~=min+2) ...
-                    || (c>=min&&(c_h>=min && c_h<=max && c_h~=min+2)&&(c_h_>=min && c_h_<=max && c_h_~=min+2))
+            if (c>=max+min) || ((c>=max-1)&&((c_h+c_h_)>=2*(max+min))&&...
+                    (c_h>=max+min||c_h_>=max+min)) && (c_h>=min&&c_h_>=min)
+                num = num + 2;
+                selectedLego = xor(selectedLego,R);    
+                continue
+            end
+            if (c==min||c==max||c==max-1) || ((c>=min-1&&c<=max+1)&&...
+                    ((c_h>=min&&c_h<=max&&c_h~=min+1)||...
+                    (c_h_>=min&&c_h_<=max&&c_h_~=min+1)))
                 num = num + 1;
                 selectedLego = xor(selectedLego,R);
                 continue
@@ -117,11 +125,6 @@ function [num, selectedLego] = count(I, mask, min, max)
             if (c>max&&c<=max+min)&&(c_h>=max+min||c_h_>=max+min)&&(c_h<min||c_h_<min) 
                 num = num + 1;
                 selectedLego = xor(selectedLego,R);   
-                continue
-            end
-            if (c>=max+min)||(c>max&&(c_h>=max+min||c_h_>=max+min))&&(c_h>=min&&c_h_>=min)
-                num = num + 2;
-                selectedLego = xor(selectedLego,R);    
             end
         end    
     end
